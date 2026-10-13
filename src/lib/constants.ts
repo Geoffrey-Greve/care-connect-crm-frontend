@@ -1,0 +1,2 @@
+export const DEFAULT_TABLE_FETCH_LIMIT = 1000;
+

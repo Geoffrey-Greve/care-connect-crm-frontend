@@ -1,0 +1,5731 @@
+{
+	"info": {
+		"_postman_id": "0485f099-ec79-4617-b671-9ef6676b498c",
+		"name": "Care Connect CRM",
+		"description": "Complete API collection for Care Connect CRM including Admin Auth, Admin Profile, Staff Auth (Mobile), Client Management, and all CRUD tables",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36685383"
+	},
+	"item": [
+		{
+			"name": "Server",
+			"item": [
+				{
+					"name": "Check Server",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/check-server",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"check-server"
+							]
+						},
+						"description": "Health check endpoint to verify server is running"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin Authentication",
+			"item": [
+				{
+					"name": "Admin Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.status && jsonData.data && jsonData.data.token) {",
+									"        pm.environment.set('token', jsonData.data.token);",
+									"        pm.collectionVariables.set('token', jsonData.data.token);",
+									"        console.log('Token saved to environment and collection variables');",
+									"    } else {",
+									"        console.log('Token not found in response');",
+									"    }",
+									"} else {",
+									"    console.log('Login failed with status:', pm.response.code);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"your-admin-password\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"login"
+							]
+						},
+						"description": "Login endpoint for admin users. Accepts email or username. Returns JWT token. Automatically saves token to environment and collection variables."
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/forgot-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"forgot-password"
+							]
+						},
+						"description": "Sends OTP to admin email for password reset via Mailgun"
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Verify OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@example.com\",\n    \"otp\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/verify-otp",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"verify-otp"
+							]
+						},
+						"description": "Verify OTP sent to admin email"
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Set New Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"newPassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/set-new-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"set-new-password"
+							]
+						},
+						"description": "Set new password after OTP verification"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin Profile",
+			"item": [
+				{
+					"name": "Get Admin Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{admin_token}}",
+								"description": "JWT token from admin login"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/get-detail",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"get-detail"
+							]
+						},
+						"description": "Get current admin profile details"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Admin Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{admin_token}}",
+								"description": "JWT token from admin login"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"email\": \"admin@example.com\",\n    \"username\": \"admin\",\n    \"profile_img\": \"data:image/png;base64,...\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/update-profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"update-profile"
+							]
+						},
+						"description": "Update admin profile information"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Staff Authentication (Mobile)",
+			"item": [
+				{
+					"name": "Staff Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"staff@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/staff/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"staff",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Login endpoint for staff users (mobile app)"
+					},
+					"response": []
+				},
+				{
+					"name": "Staff Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"staff@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/staff/auth/forgot-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"staff",
+								"auth",
+								"forgot-password"
+							]
+						},
+						"description": "Sends OTP to staff email for password reset"
+					},
+					"response": []
+				},
+				{
+					"name": "Staff Verify OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"staff@example.com\",\n    \"otp\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/staff/auth/verify-otp",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"staff",
+								"auth",
+								"verify-otp"
+							]
+						},
+						"description": "Verify OTP sent to staff email"
+					},
+					"response": []
+				},
+				{
+					"name": "Staff Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"staff@example.com\",\n    \"otp\": \"123456\",\n    \"password\": \"newPassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/staff/auth/reset-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"staff",
+								"auth",
+								"reset-password"
+							]
+						},
+						"description": "Reset staff password after OTP verification"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Client",
+			"item": [
+				{
+					"name": "Client Goal",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"client_id\": 1,\n    \"title\": \"Improve Communication Skills\",\n    \"commencement_date\": \"2025-01-01\",\n    \"description\": \"Work on improving verbal and non-verbal communication skills\",\n    \"goal_achieved\": 0,\n    \"goal_closed\": 0\n}"
+								},
+								"description": "Create a new client goal. goal_achieved and goal_closed are optional (default: 0). Values must be 0 or 1.",
+								"url": {
+									"raw": "{{base_url}}/api/client-goal/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client-goal",
+										"create"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List All",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/client-goal/list?client_id=1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client-goal",
+										"list"
+									],
+									"query": [
+										{
+											"key": "client_id",
+											"value": "1",
+											"description": "Optional: Filter by client ID"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get By ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/client-goal/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client-goal",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"Improved Communication Skills\",\n    \"description\": \"Updated description\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/client-goal/update/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client-goal",
+										"update",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Toggle Goal Achieved",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"goal_achieved\": 1\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/client-goal/achieved/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client-goal",
+										"achieved",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Toggle Goal Closed",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"goal_closed\": 1\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/client-goal/closed/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client-goal",
+										"closed",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/client-goal/status/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client-goal",
+										"status",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/client-goal/delete/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client-goal",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Client Management",
+					"item": [
+						{
+							"name": "Create Client",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"salutation\": \"Mr\",\n    \"email\": \"client@example.com\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"display_name\": \"John Doe\",\n    \"gender\": \"male\",\n    \"date_of_birth\": \"1990-01-01\",\n    \"primary_phone_number\": \"+1234567890\",\n    \"secondary_phone_number\": \"+1234567891\",\n    \"client_type\": 1,\n    \"ndis_number\": \"NDIS123456\",\n    \"nationality\": \"Australian\",\n    \"religion\": \"Christian\",\n    \"marital_status\": \"single\",\n    \"address\": \"123 Main St, City, Country\",\n    \"language\": 1,\n    \"profile_img\": \"data:image/png;base64,...\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/client/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client",
+										"create"
+									]
+								},
+								"description": "Create a new client. Required: email, client_type, marital_status. user_id is automatically set from authenticated user. Response includes documents and goals arrays."
+							},
+							"response": []
+						},
+						{
+							"name": "List All Clients",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/client/list?status=1&archived=0",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client",
+										"list"
+									],
+									"query": [
+										{
+											"key": "status",
+											"value": "1",
+											"description": "Optional: Filter by status (1=active, 0=inactive)"
+										},
+										{
+											"key": "archived",
+											"value": "0",
+											"description": "Optional: Filter by archive status (1=archived, 0=not archived)"
+										}
+									]
+								},
+								"description": "Get list of all clients with optional filters. Response includes documents and goals for each client."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Client by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/client/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Client ID"
+										}
+									]
+								},
+								"description": "Get client details by ID with client type, language, user, documents, and goals"
+							},
+							"response": []
+						},
+						{
+							"name": "Update Client",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"first_name\": \"John Updated\",\n    \"last_name\": \"Doe Updated\",\n    \"email\": \"client@example.com\",\n    \"primary_phone_number\": \"+1234567890\",\n    \"client_type\": 1,\n    \"ndis_number\": \"NDIS123456\",\n    \"nationality\": \"Australian\",\n    \"religion\": \"Christian\",\n    \"marital_status\": \"married\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/client/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Client ID"
+										}
+									]
+								},
+								"description": "Update client details. All fields are optional. Response includes documents and goals arrays."
+							},
+							"response": []
+						},
+						{
+							"name": "Toggle Client Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/client/:id/toggle-status",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client",
+										":id",
+										"toggle-status"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Client ID"
+										}
+									]
+								},
+								"description": "Toggle client status (Active/Inactive)"
+							},
+							"response": []
+						},
+						{
+							"name": "Archive Client",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/client/:id/archive",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client",
+										":id",
+										"archive"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Client ID"
+										}
+									]
+								},
+								"description": "Archive a client (sets archived flag to 1)"
+							},
+							"response": []
+						},
+						{
+							"name": "Unarchive Client",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/client/:id/unarchive",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client",
+										":id",
+										"unarchive"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Client ID"
+										}
+									]
+								},
+								"description": "Unarchive a client (sets archived flag to 0)"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Client",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/client/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Client ID"
+										}
+									]
+								},
+								"description": "Soft delete a client (sets isdeleted flag to 1)"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Client Document",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"client_id\": 1,\n    \"name\": \"Medical Report\",\n    \"document\": null,\n    \"staff_visibility\": 1,\n    \"expiration\": 1,\n    \"expiration_date\": \"2025-12-31\",\n    \"category_id\": 1\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/client/document/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client",
+										"document",
+										"create"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List All",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/client-document/list?client_id=1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client-document",
+										"list"
+									],
+									"query": [
+										{
+											"key": "client_id",
+											"value": "1",
+											"description": "Optional: Filter by client ID"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get By ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/client-document/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client-document",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Updated Medical Report\",\n    \"document\": null,\n    \"staff_visibility\": 0,\n    \"expiration\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/client-document/update/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client-document",
+										"update",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/client-document/status/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client-document",
+										"status",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/client-document/delete/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client-document",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Strategy",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"client_id\": 1,\n    \"goal_id\": 1,\n    \"due_at\": \"2025-12-31\",\n    \"description\": \"Strategy description here\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/strategy/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"strategy",
+										"create"
+									]
+								},
+								"description": "Create a new strategy. Validates that goal belongs to the specified client."
+							},
+							"response": []
+						},
+						{
+							"name": "List All",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/strategy/list?client_id=1&goal_id=1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"strategy",
+										"list"
+									],
+									"query": [
+										{
+											"key": "client_id",
+											"value": "1",
+											"description": "Optional: Filter by client ID"
+										},
+										{
+											"key": "goal_id",
+											"value": "1",
+											"description": "Optional: Filter by goal ID"
+										}
+									]
+								},
+								"description": "Get list of all strategies with optional filters. Response includes Client and ClientGoal details."
+							},
+							"response": []
+						},
+						{
+							"name": "Get By ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/strategy/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"strategy",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Get strategy details by ID with Client and ClientGoal information"
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"due_at\": \"2025-12-31\",\n    \"description\": \"Updated strategy description\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/strategy/update/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"strategy",
+										"update",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Update strategy details. All fields are optional."
+							},
+							"response": []
+						},
+						{
+							"name": "Toggle Completed",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"completed\": 1,\n    \"completion_outcome\": \"Strategy completed successfully\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/strategy/completed/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"strategy",
+										"completed",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Toggle completed status (0 or 1) and optionally set completion_outcome"
+							},
+							"response": []
+						},
+						{
+							"name": "Toggle Reviewed",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"reviewed\": 1,\n    \"review_outcome\": \"Strategy reviewed and approved\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/strategy/reviewed/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"strategy",
+										"reviewed",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Toggle reviewed status (0 or 1) and optionally set review_outcome"
+							},
+							"response": []
+						},
+						{
+							"name": "Change Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/strategy/status/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"strategy",
+										"status",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Change strategy status (0=inactive, 1=active)"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/strategy/delete/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"strategy",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Soft delete strategy (sets is_deleted = 1)"
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Staff",
+			"item": [
+				{
+					"name": "Staff Document Management",
+					"item": [
+						{
+							"name": "Create Staff Document",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"staff_id\": 1,\n    \"name\": \"Certificate of Employment\",\n    \"document\": null,\n    \"staff_visibility\": 1,\n    \"expiration\": 1,\n    \"expiration_date\": \"2025-12-31\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff-document/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff-document",
+										"create"
+									]
+								},
+								"description": "Create a new staff document. user_id is automatically set from authenticated user."
+							},
+							"response": []
+						},
+						{
+							"name": "List All Staff Documents",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff-document/list?staff_id=1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff-document",
+										"list"
+									],
+									"query": [
+										{
+											"key": "staff_id",
+											"value": "1",
+											"description": "Optional: Filter by staff ID"
+										}
+									]
+								},
+								"description": "Get list of all staff documents with optional staff_id filter"
+							},
+							"response": []
+						},
+						{
+							"name": "Show Expired Documents",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff-document/expire",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff-document",
+										"expire"
+									]
+								},
+								"description": "Get list of all expired staff documents"
+							},
+							"response": []
+						},
+						{
+							"name": "Get Staff Document by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff-document/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff-document",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Document ID"
+										}
+									]
+								},
+								"description": "Get staff document details by ID"
+							},
+							"response": []
+						},
+						{
+							"name": "Update Staff Document",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Updated Certificate\",\n    \"document\": null,\n    \"staff_visibility\": 0,\n    \"expiration\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff-document/update/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff-document",
+										"update",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Document ID"
+										}
+									]
+								},
+								"description": "Update staff document details. All fields are optional."
+							},
+							"response": []
+						},
+						{
+							"name": "Change Document Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff-document/status/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff-document",
+										"status",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Document ID"
+										}
+									]
+								},
+								"description": "Toggle document status (0=inactive, 1=active)"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Staff Document",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff-document/delete/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff-document",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Document ID"
+										}
+									]
+								},
+								"description": "Soft delete staff document (sets is_deleted = 1)"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Staff Management",
+					"item": [
+						{
+							"name": "Create Staff",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"salutation\": \"Mr\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"gender\": \"male\",\n    \"date_of_birth\": \"1990-01-01\",\n    \"primary_phone_number\": \"+1234567890\",\n    \"secondary_phone_number\": \"+1234567891\",\n    \"email\": \"staff@example.com\",\n    \"username\": \"staffuser\",\n    \"password\": \"password123\",\n    \"address\": \"123 Main St, City, Country\",\n    \"profile_img\": \"path/to/image.jpg\",\n    \"role_id\": 1,\n    \"employment_type\": \"full-time\",\n    \"skills\": [\"nursing\", \"first-aid\"],\n    \"language\": 1\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"create"
+									]
+								},
+								"description": "Create a new staff member with role and language relationships. created_by is automatically set from authenticated user."
+							},
+							"response": []
+						},
+						{
+							"name": "List All Staffs",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff/get-all?status=1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"get-all"
+									],
+									"query": [
+										{
+											"key": "status",
+											"value": "1",
+											"description": "Optional: Filter by status (1=active, 0=inactive)"
+										}
+									]
+								},
+								"description": "Get list of all staffs with optional status filter. Response includes Role and Language details."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Staff by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff/get-detail/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"get-detail",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Staff ID (User ID)"
+										}
+									]
+								},
+								"description": "Get staff details by ID with Role and Language information"
+							},
+							"response": []
+						},
+						{
+							"name": "Update Staff",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"first_name\": \"John Updated\",\n    \"last_name\": \"Doe Updated\",\n    \"email\": \"staff.updated@example.com\",\n    \"role_id\": 2,\n    \"employment_type\": \"part-time\",\n    \"skills\": [\"nursing\", \"first-aid\", \"cpr\"],\n    \"language\": 2\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff/update/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"update",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Staff ID (User ID)"
+										}
+									]
+								},
+								"description": "Update staff details. All fields are optional. Response includes Role and Language details."
+							},
+							"response": []
+						},
+						{
+							"name": "Toggle Staff Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff/status/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"status",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Staff ID (User ID)"
+										}
+									]
+								},
+								"description": "Toggle staff status (0=inactive, 1=active). Updates both User and StaffDetail status."
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Staff",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff/delete/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Staff ID (User ID)"
+										}
+									]
+								},
+								"description": "Soft delete staff (sets isdeleted = 1 for both User and StaffDetail)"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Staff Leave Management",
+					"item": [
+						{
+							"name": "Create Staff Leave",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"staff_id\": 1,\n    \"unavailable_dates\": [\"2025-12-25\", \"2025-12-26\"],\n    \"all_day\": 1,\n    \"reason\": \"Holiday leave\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff/leave/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"leave",
+										"create"
+									]
+								},
+								"description": "Create a new staff leave request. unavailable_dates must be an array of dates in YYYY-MM-DD format."
+							},
+							"response": []
+						},
+						{
+							"name": "List All Staff Leaves",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff/leave/list?staff_id=1&status=pending",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"leave",
+										"list"
+									],
+									"query": [
+										{
+											"key": "staff_id",
+											"value": "1",
+											"description": "Optional: Filter by staff ID"
+										},
+										{
+											"key": "status",
+											"value": "pending",
+											"description": "Optional: Filter by status (approve, reject, pending)"
+										}
+									]
+								},
+								"description": "Get list of all staff leaves with optional filters. Response includes Staff and Creator details."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Staff Leave by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff/leave/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"leave",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Leave ID"
+										}
+									]
+								},
+								"description": "Get staff leave details by ID with Staff and Creator information"
+							},
+							"response": []
+						},
+						{
+							"name": "Update Staff Leave",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"unavailable_dates\": [\"2025-12-25\", \"2025-12-26\", \"2025-12-27\"],\n    \"all_day\": 0,\n    \"start_time\": \"09:00:00\",\n    \"end_time\": \"17:00:00\",\n    \"reason\": \"Updated reason\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff/leave/update/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"leave",
+										"update",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Leave ID"
+										}
+									]
+								},
+								"description": "Update staff leave details. All fields are optional."
+							},
+							"response": []
+						},
+						{
+							"name": "Update Leave Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": \"approve\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff/leave/status/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"leave",
+										"status",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Leave ID"
+										}
+									]
+								},
+								"description": "Update leave status (approve, reject, pending)"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Staff Leave",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff/leave/delete/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"leave",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Leave ID"
+										}
+									]
+								},
+								"description": "Soft delete staff leave (sets is_deleted = 1)"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Team Management",
+					"item": [
+						{
+							"name": "Create Team",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"team_title\": \"Nursing Team A\",\n    \"description\": \"Primary nursing team for morning shifts\",\n    \"staff_ids\": [1, 2, 3]\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff/team/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"team",
+										"create"
+									]
+								},
+								"description": "Create a new team with multiple staff members. created_by is automatically set from authenticated user."
+							},
+							"response": []
+						},
+						{
+							"name": "List All Teams",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff/team/list?status=1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"team",
+										"list"
+									],
+									"query": [
+										{
+											"key": "status",
+											"value": "1",
+											"description": "Optional: Filter by status (1=active, 0=inactive)"
+										}
+									]
+								},
+								"description": "Get list of all teams with optional status filter. Response includes Creator and Members details."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Team by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff/team/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"team",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Team ID"
+										}
+									]
+								},
+								"description": "Get team details by ID with Creator and Members information"
+							},
+							"response": []
+						},
+						{
+							"name": "Update Team",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"team_title\": \"Nursing Team A Updated\",\n    \"description\": \"Updated description\",\n    \"staff_ids\": [1, 2, 3, 4]\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff/team/update/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"team",
+										"update",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Team ID"
+										}
+									]
+								},
+								"description": "Update team details. All fields are optional. If staff_ids is provided, it will replace all existing members."
+							},
+							"response": []
+						},
+						{
+							"name": "Toggle Team Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff/team/status/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"team",
+										"status",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Team ID"
+										}
+									]
+								},
+								"description": "Toggle team status (0=inactive, 1=active)"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Team",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff/team/delete/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"team",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Team ID"
+										}
+									]
+								},
+								"description": "Soft delete team (sets is_deleted = 1)"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Staff Next of Kin",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"staff_id\": 1,\n    \"name\": \"John Doe\",\n    \"relation\": \"Spouse\",\n    \"contact\": \"+1234567890\",\n    \"email\": \"john.doe@example.com\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff/next-of-kin/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"next-of-kin",
+										"create"
+									]
+								},
+								"description": "Create a new staff next of kin. Validates staff_id exists. Email is optional."
+							},
+							"response": []
+						},
+						{
+							"name": "List All",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff/next-of-kin/list?staff_id=1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"next-of-kin",
+										"list"
+									],
+									"query": [
+										{
+											"key": "staff_id",
+											"value": "1",
+											"description": "Optional: Filter by staff ID"
+										}
+									]
+								},
+								"description": "Get list of all staff next of kin with optional staff_id filter"
+							},
+							"response": []
+						},
+						{
+							"name": "Get By ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff/next-of-kin/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"next-of-kin",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Get staff next of kin details by ID"
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"John Doe Updated\",\n    \"relation\": \"Parent\",\n    \"contact\": \"+1234567891\",\n    \"email\": \"john.updated@example.com\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff/next-of-kin/update/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"next-of-kin",
+										"update",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Update staff next of kin details. All fields are optional."
+							},
+							"response": []
+						},
+						{
+							"name": "Change Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff/next-of-kin/status/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"next-of-kin",
+										"status",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Change staff next of kin status (0=inactive, 1=active)"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff/next-of-kin/delete/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"next-of-kin",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Soft delete staff next of kin (sets is_deleted = 1)"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Staff Payroll Settings",
+					"item": [
+						{
+							"name": "Create or Update",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"staff_id\": 1,\n    \"paygroup_id\": 1,\n    \"allowance_id\": 1,\n    \"agreed_daily_hours\": 8.0,\n    \"agreed_weekly_hours\": 40.0,\n    \"lateness_threshold\": \"09:15:00\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff/payroll-settings/create-or-update",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"payroll-settings",
+										"create-or-update"
+									]
+								},
+								"description": "Create or update staff payroll settings. If settings exist for the staff, they will be updated; otherwise, new settings will be created. One row per staff."
+							},
+							"response": []
+						},
+						{
+							"name": "List All",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff/payroll-settings/list?staff_id=1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"payroll-settings",
+										"list"
+									],
+									"query": [
+										{
+											"key": "staff_id",
+											"value": "1",
+											"description": "Optional: Filter by staff ID"
+										}
+									]
+								},
+								"description": "Get list of all staff payroll settings with optional staff_id filter"
+							},
+							"response": []
+						},
+						{
+							"name": "Get By Staff ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff/payroll-settings/staff/:staff_id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"payroll-settings",
+										"staff",
+										":staff_id"
+									],
+									"variable": [
+										{
+											"key": "staff_id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Get payroll settings by staff ID"
+							},
+							"response": []
+						},
+						{
+							"name": "Get By ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff/payroll-settings/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"payroll-settings",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Get payroll settings by ID"
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"paygroup_id\": 2,\n    \"allowance_id\": 2,\n    \"agreed_daily_hours\": 7.5,\n    \"agreed_weekly_hours\": 37.5,\n    \"lateness_threshold\": \"09:30:00\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff/payroll-settings/update/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"payroll-settings",
+										"update",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Update payroll settings. All fields are optional."
+							},
+							"response": []
+						},
+						{
+							"name": "Change Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff/payroll-settings/status/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"payroll-settings",
+										"status",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Change payroll settings status (0=inactive, 1=active)"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff/payroll-settings/delete/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"payroll-settings",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Soft delete payroll settings (sets is_deleted = 1)"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Staff Notes",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"staff_id\": 1,\n    \"private_info\": \"This is private information about the staff member.\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff/notes/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"notes",
+										"create"
+									]
+								},
+								"description": "Create a new staff note. Validates staff_id exists. private_info is optional."
+							},
+							"response": []
+						},
+						{
+							"name": "List All",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff/notes/list?staff_id=1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"notes",
+										"list"
+									],
+									"query": [
+										{
+											"key": "staff_id",
+											"value": "1",
+											"description": "Optional: Filter by staff ID"
+										}
+									]
+								},
+								"description": "Get list of all staff notes with optional staff_id filter"
+							},
+							"response": []
+						},
+						{
+							"name": "Get By ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff/notes/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"notes",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Get staff note details by ID"
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"private_info\": \"Updated private information about the staff member.\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff/notes/update/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"notes",
+										"update",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Update staff note. private_info is optional."
+							},
+							"response": []
+						},
+						{
+							"name": "Change Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff/notes/status/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"notes",
+										"status",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Change staff note status (0=inactive, 1=active)"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff/notes/delete/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff",
+										"notes",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Soft delete staff note (sets is_deleted = 1)"
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Organization Master",
+			"item": [
+				{
+					"name": "Staff Role",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Nurse1\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/role/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"role",
+										"create"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List All",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/role/list",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"role",
+										"list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get By ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/role/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"role",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Nurse Updated\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/role/update/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"role",
+										"update",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/role/status/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"role",
+										"status",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/role/delete/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"role",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Staff Document Category",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Certificates\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff-document-category/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff-document-category",
+										"create"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List All",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff-document-category/list",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff-document-category",
+										"list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get By ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff-document-category/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff-document-category",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Certificates Updated\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff-document-category/update/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff-document-category",
+										"update",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/staff-document-category/status/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff-document-category",
+										"status",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/staff-document-category/delete/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"staff-document-category",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Client Type Management",
+					"item": [
+						{
+							"name": "Create Client Type",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"NDISs\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/client/client-type/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client",
+										"client-type",
+										"create"
+									]
+								},
+								"description": "Create a new client type"
+							},
+							"response": []
+						},
+						{
+							"name": "List All Client Types",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/client/client-type/list?status=1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client",
+										"client-type",
+										"list"
+									],
+									"query": [
+										{
+											"key": "status",
+											"value": "1",
+											"description": "Optional: Filter by status (1=active, 0=inactive)"
+										}
+									]
+								},
+								"description": "Get list of all client types with optional status filter"
+							},
+							"response": []
+						},
+						{
+							"name": "Get Client Type by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/client/client-type/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client",
+										"client-type",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Client Type ID"
+										}
+									]
+								},
+								"description": "Get client type details by ID"
+							},
+							"response": []
+						},
+						{
+							"name": "Update Client Type",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"NDIS Updated\",\n    \"status\": 1\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/client/client-type/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client",
+										"client-type",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Client Type ID"
+										}
+									]
+								},
+								"description": "Update client type details"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Client Type",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/client/client-type/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client",
+										"client-type",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Client Type ID"
+										}
+									]
+								},
+								"description": "Soft delete client type (cannot delete if used by clients)"
+							},
+							"response": []
+						},
+						{
+							"name": "Toggle Client Type Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}",
+										"description": "JWT token from admin login"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/client/client-type/:id/toggle-status",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client",
+										"client-type",
+										":id",
+										"toggle-status"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1",
+											"description": "Client Type ID"
+										}
+									]
+								},
+								"description": "Toggle client type status (Active/Inactive)"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Client Document Category",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Medical Records1\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/client/document-category/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client",
+										"document-category",
+										"create"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List All",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/client/document-category/list",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client",
+										"document-category",
+										"list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get By ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/client/document-category/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client",
+										"document-category",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Medical Records Updated\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/client/document-category/update/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client",
+										"document-category",
+										"update",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/client/document-category/status/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client",
+										"document-category",
+										"status",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/client/document-category/delete/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"client",
+										"document-category",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Shift Type",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Morning Shift\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/shift-type/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"shift-type",
+										"create"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List All",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/shift-type/list",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"shift-type",
+										"list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get By ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/shift-type/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"shift-type",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Morning Shift Updated\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/shift-type/update/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"shift-type",
+										"update",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/shift-type/status/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"shift-type",
+										"status",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/shift-type/delete/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"shift-type",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Language",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"English\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/language/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"language",
+										"create"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List All",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/language/list",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"language",
+										"list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get By ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/language/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"language",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"English Updated\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/language/update/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"language",
+										"update",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/language/status/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"language",
+										"status",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/language/delete/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"language",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Public Holiday",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"New Year's Day\",\n    \"date\": \"2025-01-01\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/public-holiday/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"public-holiday",
+										"create"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List All",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/public-holiday/list",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"public-holiday",
+										"list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get By ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/public-holiday/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"public-holiday",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"New Year's Day Updated\",\n    \"date\": \"2025-01-01\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/public-holiday/update/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"public-holiday",
+										"update",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/public-holiday/status/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"public-holiday",
+										"status",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/public-holiday/delete/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"public-holiday",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "KPI",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"kpi_type\": \"KPI\",\n    \"title\": \"Client Satisfaction Score\",\n    \"response_type\": \"Yes/No\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/kpi/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"kpi",
+										"create"
+									]
+								},
+								"description": "Create a new KPI. For sub KPI, include parent_kpi_id. kpi_type must be 'KPI' or 'sub KPI'. response_type must be 'Yes/No' or 'Text Box'."
+							},
+							"response": []
+						},
+						{
+							"name": "Create Sub KPI",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"kpi_type\": \"sub KPI\",\n    \"title\": \"Response Time Sub KPI\",\n    \"parent_kpi_id\": 1,\n    \"response_type\": \"Text Box\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/kpi/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"kpi",
+										"create"
+									]
+								},
+								"description": "Create a sub KPI. parent_kpi_id is required for sub KPIs."
+							},
+							"response": []
+						},
+						{
+							"name": "List All",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/kpi/list?kpi_type=KPI",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"kpi",
+										"list"
+									],
+									"query": [
+										{
+											"key": "kpi_type",
+											"value": "KPI",
+											"description": "Optional: Filter by kpi_type ('KPI' or 'sub KPI')"
+										}
+									]
+								},
+								"description": "Get list of all KPIs with optional kpi_type filter"
+							},
+							"response": []
+						},
+						{
+							"name": "Get KPIs For Select",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/kpi/select-list",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"kpi",
+										"select-list"
+									]
+								},
+								"description": "Get list of main KPIs (not sub KPIs) for dropdown selection. Returns only active KPIs with id and title."
+							},
+							"response": []
+						},
+						{
+							"name": "Get By ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/kpi/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"kpi",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Get KPI details by ID. Includes parent KPI and sub KPIs if applicable."
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"Updated KPI Title\",\n    \"response_type\": \"Text Box\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/kpi/update/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"kpi",
+										"update",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Update KPI details. All fields are optional."
+							},
+							"response": []
+						},
+						{
+							"name": "Change Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/kpi/status/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"kpi",
+										"status",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/kpi/delete/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"kpi",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Soft delete KPI. Cannot delete if it has sub KPIs."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Skill",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Nursing\",\n    \"description\": \"Professional nursing skills and patient care\",\n    \"category\": \"Healthcare\",\n    \"level\": \"intermediate\",\n    \"icon\": \"nurse-icon.svg\",\n    \"color\": \"#3498db\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/skill/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"skill",
+										"create"
+									]
+								},
+								"description": "Create a new skill with dynamic fields. Only name is required. user_id is auto-saved from authenticated user."
+							},
+							"response": []
+						},
+						{
+							"name": "List All",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/skill/list?status=1&category=Healthcare&level=intermediate&search=nursing",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"skill",
+										"list"
+									],
+									"query": [
+										{
+											"key": "status",
+											"value": "1",
+											"description": "Optional: Filter by status (0=inactive, 1=active)"
+										},
+										{
+											"key": "category",
+											"value": "Healthcare",
+											"description": "Optional: Filter by category"
+										},
+										{
+											"key": "level",
+											"value": "intermediate",
+											"description": "Optional: Filter by level (beginner, intermediate, advanced)"
+										},
+										{
+											"key": "search",
+											"value": "nursing",
+											"description": "Optional: Search in name, description, or category"
+										}
+									]
+								},
+								"description": "Get list of all skills with optional filters (status, category, level, search)"
+							},
+							"response": []
+						},
+						{
+							"name": "Get By ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/skill/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"skill",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Get skill details by ID"
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Advanced Nursing\",\n    \"description\": \"Updated description for advanced nursing skills\",\n    \"category\": \"Healthcare\",\n    \"level\": \"advanced\",\n    \"icon\": \"advanced-nurse-icon.svg\",\n    \"color\": \"#2ecc71\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/skill/update/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"skill",
+										"update",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Update skill details. All fields are optional. Level must be one of: beginner, intermediate, advanced"
+							},
+							"response": []
+						},
+						{
+							"name": "Change Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/skill/status/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"skill",
+										"status",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Change skill status (0=inactive, 1=active)"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/skill/delete/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"skill",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Soft delete skill (sets is_deleted = 1)"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Pay Group",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Group A\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/pay-group/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"pay-group",
+										"create"
+									]
+								},
+								"description": "Create a new pay group"
+							},
+							"response": []
+						},
+						{
+							"name": "List All",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/pay-group/list",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"pay-group",
+										"list"
+									]
+								},
+								"description": "Get list of all pay groups"
+							},
+							"response": []
+						},
+						{
+							"name": "Get By ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/pay-group/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"pay-group",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Get pay group details by ID"
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Group A Updated\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/pay-group/update/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"pay-group",
+										"update",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Update pay group details"
+							},
+							"response": []
+						},
+						{
+							"name": "Change Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/pay-group/status/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"pay-group",
+										"status",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Change pay group status (0=inactive, 1=active)"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/pay-group/delete/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"pay-group",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Soft delete pay group (sets is_deleted = 1)"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Allowance",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"Travel Allowance\",\n    \"allowance_type\": \"Expense.Mileage/Travel\",\n    \"value\": 50.00,\n    \"external_id_code\": \"EXT001\",\n    \"external_id\": \"EXT-ID-001\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/allowance/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"allowance",
+										"create"
+									]
+								},
+								"description": "Create a new allowance. allowance_type must be one of: Expense.Mileage/Travel, Override payitems, Override hours, One-off, Permanent, Sleepover"
+							},
+							"response": []
+						},
+						{
+							"name": "List All",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/allowance/list?allowance_type=Permanent",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"allowance",
+										"list"
+									],
+									"query": [
+										{
+											"key": "allowance_type",
+											"value": "Permanent",
+											"description": "Optional: Filter by allowance_type"
+										}
+									]
+								},
+								"description": "Get list of all allowances with optional allowance_type filter"
+							},
+							"response": []
+						},
+						{
+							"name": "Get By ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/allowance/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"allowance",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Get allowance details by ID"
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"Updated Travel Allowance\",\n    \"value\": 75.00,\n    \"external_id_code\": \"EXT001-UPDATED\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/allowance/update/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"allowance",
+										"update",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Update allowance details. All fields are optional."
+							},
+							"response": []
+						},
+						{
+							"name": "Change Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": 0\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/allowance/status/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"allowance",
+										"status",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Change allowance status (0=inactive, 1=active)"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/allowance/delete/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"allowance",
+										"delete",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Soft delete allowance (sets is_deleted = 1)"
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Notification",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"New Notification\",\n    \"message\": \"This is a notification message\",\n    \"type\": \"sos\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/notification/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"notification",
+								"create"
+							]
+						},
+						"description": "Create a new notification. type can be 'sos' or 'other'."
+					},
+					"response": []
+				},
+				{
+					"name": "List All",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/notification/list",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"notification",
+								"list"
+							]
+						},
+						"description": "Get list of all notifications"
+					},
+					"response": []
+				},
+				{
+					"name": "List SOS Notifications",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/notification/sos-list",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"notification",
+								"sos-list"
+							]
+						},
+						"description": "Get list of SOS type notifications only"
+					},
+					"response": []
+				},
+				{
+					"name": "List Other Notifications",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/notification/other-list",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"notification",
+								"other-list"
+							]
+						},
+						"description": "Get list of other type notifications (non-SOS)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get By ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/notification/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"notification",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Get notification details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Updated Notification Title\",\n    \"message\": \"Updated message\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/notification/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"notification",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Update notification details"
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/notification/:id/toggle-status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"notification",
+								":id",
+								"toggle-status"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Toggle notification status (active/inactive)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/notification/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"notification",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Delete notification"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3002",
+			"description": "Base URL for the API server"
+		},
+		{
+			"key": "admin_token",
+			"value": "",
+			"description": "JWT token from admin login - set this after logging in as admin"
+		},
+		{
+			"key": "staff_token",
+			"value": "",
+			"description": "JWT token from staff login - set this after logging in as staff"
+		},
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "base_url",
+			"value": "",
+			"disabled": true
+		}
+	]
+}
